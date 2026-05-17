@@ -160,6 +160,7 @@ class StreamSession : public QObject
 	Q_PROPERTY(bool muted READ GetMuted WRITE SetMuted NOTIFY MutedChanged)
 	Q_PROPERTY(bool cantDisplay READ GetCantDisplay NOTIFY CantDisplayChanged)
 	Q_PROPERTY(int framesLost READ GetFramesLost NOTIFY FramesLostChanged)
+	Q_PROPERTY(bool spectatorMode READ spectatorMode CONSTANT)
 
 	private:
 		SessionLog log;
@@ -242,6 +243,7 @@ class StreamSession : public QObject
 		QElapsedTimer double_tap_timer;
 		RumbleHapticsIntensity rumble_haptics_intensity;
 		bool start_mic_unmuted;
+		bool spectator_mode;
 		bool session_started;
 
 		ChiakiFfmpegDecoder *ffmpeg_decoder;
@@ -353,6 +355,7 @@ class StreamSession : public QObject
 		void SetMuted(bool enable)	{ if (enable != muted) ToggleMute(); }
 		void SetAudioVolume(int volume) { audio_volume = volume; }
 		bool GetCantDisplay()	{ return cant_display; }
+		bool spectatorMode() const	{ return spectator_mode; }
 		ChiakiErrorCode ConnectPsnConnection(QString duid, bool ps5);
 		void CancelPsnConnection(bool stop_thread);
 

@@ -479,6 +479,7 @@ StreamSession::StreamSession(const StreamSessionConnectInfo &connect_info, QObje
 	chiaki_connect_info.auto_regist = connect_info.auto_regist;
 	chiaki_connect_info.audio_video_disabled = connect_info.audio_video_disabled;
 	chiaki_connect_info.spectator_mode = connect_info.spectator_mode;
+	this->spectator_mode = connect_info.spectator_mode;
 
 	dpad_touch_shortcut1 = connect_info.dpad_touch_shortcut1;
 	dpad_touch_shortcut2 = connect_info.dpad_touch_shortcut2;

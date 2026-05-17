@@ -279,6 +279,29 @@ Item {
         }
     }
 
+    Rectangle {
+        id: spectatorBadge
+        visible: Chiaki.session && Chiaki.session.spectatorMode
+        anchors.top: parent.top
+        anchors.right: parent.right
+        anchors.margins: 16
+        color: "#cc000000"
+        border.color: "#ffaa00"
+        border.width: 1
+        radius: 4
+        width: spectatorLabel.implicitWidth + 16
+        height: spectatorLabel.implicitHeight + 8
+
+        Text {
+            id: spectatorLabel
+            anchors.centerIn: parent
+            text: qsTr("SPECTATOR")
+            color: "#ffaa00"
+            font.bold: true
+            font.pixelSize: 14
+        }
+    }
+
     RoundButton {
         anchors {
             right: parent.right
