@@ -3,6 +3,7 @@
 #include <munit.h>
 #include <string.h>
 #include <chiaki/session.h>
+#include <chiaki/log.h>
 
 // Verify ChiakiConnectInfo has a spectator_mode field that defaults to false.
 static MunitResult test_connect_info_has_spectator_mode_default_false(
@@ -28,6 +29,30 @@ static MunitResult test_connect_info_spectator_mode_settable(
 	return MUNIT_OK;
 }
 
+// Verify chiaki_session_init copies spectator_mode from ConnectInfo to session.
+static MunitResult test_session_init_copies_spectator_mode(
+		const MunitParameter params[], void *user)
+{
+	(void)params; (void)user;
+	ChiakiConnectInfo info;
+	memset(&info, 0, sizeof(info));
+	info.host = "127.0.0.1";
+	info.regist_key[0] = '\0';
+	info.spectator_mode = true;
+
+	ChiakiLog log;
+	chiaki_log_init(&log, CHIAKI_LOG_ALL, NULL, NULL);
+
+	ChiakiSession session;
+	// chiaki_session_init may return an error because host isn't reachable
+	// or registration data is incomplete, but the spectator_mode copy
+	// happens before any network I/O / heavy validation.
+	chiaki_session_init(&session, &info, &log);
+	munit_assert_true(session.spectator_mode);
+	chiaki_session_fini(&session);
+	return MUNIT_OK;
+}
+
 MunitTest tests_spectator[] = {
 	{
 		"/connect_info_has_spectator_mode_default_false",
@@ -37,6 +62,11 @@ MunitTest tests_spectator[] = {
 	{
 		"/connect_info_spectator_mode_settable",
 		test_connect_info_spectator_mode_settable,
+		NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL
+	},
+	{
+		"/session_init_copies_spectator_mode",
+		test_session_init_copies_spectator_mode,
 		NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL
 	},
 	{ NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }

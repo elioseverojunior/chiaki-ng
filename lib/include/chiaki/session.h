@@ -279,6 +279,8 @@ typedef struct chiaki_session_t
 	ChiakiStreamConnection stream_connection;
 
 	ChiakiControllerState controller_state;
+
+	bool spectator_mode;
 } ChiakiSession;
 
 CHIAKI_EXPORT ChiakiErrorCode chiaki_session_init(ChiakiSession *session, ChiakiConnectInfo *connect_info, ChiakiLog *log);
