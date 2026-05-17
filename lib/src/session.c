@@ -351,6 +351,11 @@ CHIAKI_EXPORT ChiakiErrorCode chiaki_session_set_controller_state(ChiakiSession 
 
 CHIAKI_EXPORT ChiakiErrorCode chiaki_session_set_login_pin(ChiakiSession *session, const uint8_t *pin, size_t pin_size)
 {
+	if(session->spectator_mode)
+	{
+		CHIAKI_LOGI(session->log, "Spectator mode: dropping login PIN submission");
+		return CHIAKI_ERR_SUCCESS;
+	}
 	uint8_t *buf = malloc(pin_size);
 	if(!buf){
 		return CHIAKI_ERR_MEMORY;
@@ -1172,16 +1177,31 @@ CHIAKI_EXPORT ChiakiErrorCode chiaki_session_connect_microphone(ChiakiSession *s
 
 CHIAKI_EXPORT ChiakiErrorCode chiaki_session_keyboard_set_text(ChiakiSession *session, const char *text)
 {
+	if(session->spectator_mode)
+	{
+		CHIAKI_LOGI(session->log, "Spectator mode: dropping OSK text submission");
+		return CHIAKI_ERR_SUCCESS;
+	}
 	return chiaki_ctrl_keyboard_set_text(&session->ctrl, text);
 }
 
 CHIAKI_EXPORT ChiakiErrorCode chiaki_session_keyboard_reject(ChiakiSession *session)
 {
+	if(session->spectator_mode)
+	{
+		CHIAKI_LOGI(session->log, "Spectator mode: dropping OSK reject");
+		return CHIAKI_ERR_SUCCESS;
+	}
 	return chiaki_ctrl_keyboard_reject(&session->ctrl);
 }
 
 CHIAKI_EXPORT ChiakiErrorCode chiaki_session_keyboard_accept(ChiakiSession *session)
 {
+	if(session->spectator_mode)
+	{
+		CHIAKI_LOGI(session->log, "Spectator mode: dropping OSK accept");
+		return CHIAKI_ERR_SUCCESS;
+	}
 	return chiaki_ctrl_keyboard_accept(&session->ctrl);
 }
 

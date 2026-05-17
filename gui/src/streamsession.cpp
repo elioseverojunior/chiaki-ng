@@ -874,6 +874,11 @@ void StreamSession::ToggleMute()
 
 void StreamSession::SetLoginPIN(const QString &pin)
 {
+	if(session.spectator_mode)
+	{
+		CHIAKI_LOGI(GetChiakiLog(), "Spectator mode: dropping login PIN submission");
+		return;
+	}
 	QByteArray data = pin.toUtf8();
 	chiaki_session_set_login_pin(&session, (const uint8_t *)data.constData(), data.size());
 }
