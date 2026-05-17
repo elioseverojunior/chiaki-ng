@@ -825,6 +825,11 @@ void StreamSession::ToggleMute()
 {
 	if(!allow_unmute)
 		return;
+	if(session.spectator_mode)
+	{
+		CHIAKI_LOGI(GetChiakiLog(), "Spectator mode: skipping microphone capture init");
+		return;
+	}
 	if(!mic_connected)
 	{
 #ifdef Q_OS_MACOS
