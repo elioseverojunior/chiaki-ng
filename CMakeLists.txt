@@ -56,10 +56,14 @@ include(CPack)
 set(CHIAKI_IS_SWITCH ${NSWITCH})
 
 if(APPLE)
+	# Provide a default deployment target but DO NOT FORCE — allow callers to
+	# override via -DCMAKE_OSX_DEPLOYMENT_TARGET=… for local dev builds whose
+	# Homebrew dylibs are built for newer macOS versions (silences "built for
+	# newer version X" linker warnings when targeting the host's actual OS).
 	if(CMAKE_HOST_SYSTEM_PROCESSOR STREQUAL "arm64")
-		set(CMAKE_OSX_DEPLOYMENT_TARGET 13.0 CACHE STRING "Minimum OS X deployment version" FORCE)
+		set(CMAKE_OSX_DEPLOYMENT_TARGET 13.0 CACHE STRING "Minimum OS X deployment version")
 	else()
-		set(CMAKE_OSX_DEPLOYMENT_TARGET 12.0 CACHE STRING "Minimum OS X deployment version" FORCE)
+		set(CMAKE_OSX_DEPLOYMENT_TARGET 12.0 CACHE STRING "Minimum OS X deployment version")
 	endif()
 endif()
 
