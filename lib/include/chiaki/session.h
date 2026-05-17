@@ -89,6 +89,7 @@ typedef struct chiaki_connect_info_t
 	uint8_t psn_account_id[CHIAKI_PSN_ACCOUNT_ID_SIZE];
 	double packet_loss_max;
 	bool enable_idr_on_fec_failure;
+	bool spectator_mode;
 } ChiakiConnectInfo;
 
 
