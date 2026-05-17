@@ -165,6 +165,8 @@ CHIAKI_EXPORT void chiaki_feedback_sender_prepare_state_for_test(
 
 static void feedback_sender_send_history_packet(ChiakiFeedbackSender *feedback_sender, const uint8_t *buf, size_t buf_size)
 {
+	if(feedback_sender->spectator_mode)
+		return; /* spectator mode: suppress event-driven input (buttons, triggers, touchpad) */
 	//CHIAKI_LOGD(feedback_sender->log, "Feedback History:");
 	//chiaki_log_hexdump(feedback_sender->log, CHIAKI_LOG_DEBUG, buf, buf_size);
 	chiaki_takion_send_feedback_history(feedback_sender->takion, feedback_sender->history_seq_num++, (uint8_t *)buf, buf_size);
