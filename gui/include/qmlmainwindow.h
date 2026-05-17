@@ -102,7 +102,7 @@ public:
     };
     Q_ENUM(VideoPreset);
 
-    QmlMainWindow(Settings *settings,  bool exit_app_on_stream_exit = false);
+    QmlMainWindow(Settings *settings,  bool exit_app_on_stream_exit = false, bool spectator_locked = false);
     QmlMainWindow(const StreamSessionConnectInfo &connect_info);
     ~QmlMainWindow();
     void updateWindowType(WindowType type);
@@ -193,7 +193,7 @@ private:
     bool makeOpenGLContextCurrent();
     void doneOpenGLContextCurrent();
 
-    void init(Settings *settings, bool exit_app_on_stream_exit = false);
+    void init(Settings *settings, bool exit_app_on_stream_exit = false, bool spectator_locked = false);
     pl_gpu placeboGpu() const;
     void update();
     void scheduleUpdate(bool force = false);

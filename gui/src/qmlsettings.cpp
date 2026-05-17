@@ -122,6 +122,17 @@ void QmlSettings::setStreamerMode(bool enabled)
     emit streamerModeChanged();
 }
 
+bool QmlSettings::spectatorMode() const
+{
+    return settings->GetSpectatorMode();
+}
+
+void QmlSettings::setSpectatorMode(bool enabled)
+{
+    settings->SetSpectatorMode(enabled);
+    emit spectatorModeChanged();
+}
+
 float QmlSettings::hapticOverride() const
 {
     return settings->GetHapticOverride();

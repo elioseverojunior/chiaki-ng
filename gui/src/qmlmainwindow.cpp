@@ -2501,11 +2501,11 @@ private:
     QWindow *window = {};
 };
 
-QmlMainWindow::QmlMainWindow(Settings *settings, bool exit_app_on_stream_exit)
+QmlMainWindow::QmlMainWindow(Settings *settings, bool exit_app_on_stream_exit, bool spectator_locked)
     : QWindow()
     , settings(settings)
 {
-    init(settings, exit_app_on_stream_exit);
+    init(settings, exit_app_on_stream_exit, spectator_locked);
 }
 
 QmlMainWindow::QmlMainWindow(const StreamSessionConnectInfo &connect_info)
@@ -4704,7 +4704,7 @@ void QmlMainWindow::doneOpenGLContextCurrent()
     }, Qt::BlockingQueuedConnection);
 }
 
-void QmlMainWindow::init(Settings *settings, bool exit_app_on_stream_exit)
+void QmlMainWindow::init(Settings *settings, bool exit_app_on_stream_exit, bool spectator_locked)
 {
     render_backend = settings->GetRenderBackend();
     setSurfaceType(render_backend == RenderBackend::Vulkan ? QWindow::VulkanSurface : QWindow::OpenGLSurface);
@@ -5013,7 +5013,7 @@ renderer_backend_ready:
         qml_engine->setIncubationController(quick_window->incubationController());
     connect(qml_engine, &QQmlEngine::quit, this, &QWindow::close);
 
-    backend = new QmlBackend(settings, this);
+    backend = new QmlBackend(settings, this, spectator_locked);
     stats_overlay_widget = new StatsOverlayWidget(this, backend);
     connect(backend, &QmlBackend::sessionChanged, this, [this, exit_app_on_stream_exit](StreamSession *s) {
         const bool preserve_startup_warmup = s && startup_warmup_preserve_next_session_change;

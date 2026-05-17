@@ -62,7 +62,7 @@ static const QMap<QString, CLICommand> cli_commands = {
 #endif
 
 int RunStream(QGuiApplication &app, const StreamSessionConnectInfo &connect_info);
-int RunMain(QGuiApplication &app, Settings *settings, bool exit_app_on_stream_exit);
+int RunMain(QGuiApplication &app, Settings *settings, bool exit_app_on_stream_exit, bool spectator_locked = false);
 
 int real_main(int argc, char *argv[])
 {
@@ -215,10 +215,9 @@ int real_main(int argc, char *argv[])
 		active_settings->SetSpectatorMode(false);
 
 	bool spectator_locked = parser.isSet(lock_spectator_option);
-	(void)spectator_locked;  // consumed in Phase 7.4 (settings dialog hide)
 
 	if(args.length() == 0)
-		return RunMain(app, use_alt_settings ? &alt_settings : &settings, exit_app_on_stream_exit);
+		return RunMain(app, use_alt_settings ? &alt_settings : &settings, exit_app_on_stream_exit, spectator_locked);
 
 	if(args[0] == "list")
 	{
@@ -344,9 +343,9 @@ int real_main(int argc, char *argv[])
 	}
 }
 
-int RunMain(QGuiApplication &app, Settings *settings, bool exit_app_on_stream_exit)
+int RunMain(QGuiApplication &app, Settings *settings, bool exit_app_on_stream_exit, bool spectator_locked)
 {
-	QmlMainWindow main_window(settings, exit_app_on_stream_exit);
+	QmlMainWindow main_window(settings, exit_app_on_stream_exit, spectator_locked);
 	main_window.show();
 	return app.exec();
 }

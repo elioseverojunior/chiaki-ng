@@ -607,6 +607,24 @@ DialogView {
                         }
 
                         Label {
+                            visible: !Chiaki.spectatorLocked
+                            Layout.alignment: Qt.AlignRight
+                            text: qsTr("Spectator Mode (read-only)")
+                        }
+                        C.CheckBox {
+                            id: spectatorMode
+                            visible: !Chiaki.spectatorLocked
+                            checked: Chiaki.settings.spectatorMode
+                            onToggled: Chiaki.settings.spectatorMode = !Chiaki.settings.spectatorMode
+                        }
+
+                        Label {
+                            visible: !Chiaki.spectatorLocked
+                            Layout.alignment: Qt.AlignRight
+                            text: qsTr("(Unchecked)")
+                        }
+
+                        Label {
                             Layout.alignment: Qt.AlignRight
                             text: qsTr("Stream Menu Shortcut Enabled")
                         }
@@ -615,7 +633,7 @@ DialogView {
                             checked: Chiaki.settings.streamMenuEnabled
                             onToggled: Chiaki.settings.streamMenuEnabled = !Chiaki.settings.streamMenuEnabled
                             KeyNavigation.priority: KeyNavigation.BeforeItem
-                            KeyNavigation.up: streamerMode
+                            KeyNavigation.up: spectatorMode.visible ? spectatorMode : streamerMode
                             KeyNavigation.left: streamMenu
                             KeyNavigation.right: streamMenu
                             KeyNavigation.down: {

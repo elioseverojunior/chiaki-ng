@@ -280,11 +280,12 @@ void QmlRegist::regist_cb(ChiakiRegistEvent *event, void *user)
     }
 }
 
-QmlBackend::QmlBackend(Settings *settings, QmlMainWindow *window)
+QmlBackend::QmlBackend(Settings *settings, QmlMainWindow *window, bool spectator_locked)
     : QObject(window)
     , settings(settings)
     , settings_qml(new QmlSettings(settings, this))
     , window(window)
+    , spectator_locked(spectator_locked)
 {
     qt_msg_handler = qInstallMessageHandler(msg_handler);
 

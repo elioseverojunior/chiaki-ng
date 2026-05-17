@@ -93,6 +93,7 @@ class QmlBackend : public QObject
     Q_PROPERTY(bool controllerMappingInProgress READ controllerMappingInProgress NOTIFY controllerMappingInProgressChanged)
     Q_PROPERTY(bool controllerMappingAltered READ controllerMappingAltered NOTIFY controllerMappingAlteredChanged)
     Q_PROPERTY(bool enableAnalogStickMapping READ enableAnalogStickMapping WRITE setEnableAnalogStickMapping NOTIFY enableAnalogStickMappingChanged)
+    Q_PROPERTY(bool spectatorLocked READ spectatorLocked CONSTANT)
 
 public:
 
@@ -111,8 +112,10 @@ public:
         ConnectFailedConsoleUnreachable,
     };
     Q_ENUM(PsnConnectState);
-    QmlBackend(Settings *settings, QmlMainWindow *window);
+    QmlBackend(Settings *settings, QmlMainWindow *window, bool spectator_locked = false);
     ~QmlBackend();
+
+    bool spectatorLocked() const { return spectator_locked; }
 
     QmlMainWindow *qmlWindow() const;
     QmlSettings *qmlSettings() const;
@@ -327,6 +330,7 @@ private:
     bool controller_mapping_reset_requested = false;
     bool controller_mapping_in_progress = false;
     bool enable_analog_stick_mapping = false;
+    bool spectator_locked = false;
     bool resume_session = false;
     bool settings_allocd = false;
     HostMAC auto_connect_mac = {};
