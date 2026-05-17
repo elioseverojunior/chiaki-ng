@@ -40,6 +40,15 @@ CHIAKI_EXPORT void chiaki_feedback_state_format_v9(uint8_t *buf, ChiakiFeedbackS
  */
 CHIAKI_EXPORT void chiaki_feedback_state_format_v12(uint8_t *buf, ChiakiFeedbackState *state);
 
+/**
+ * Zero-fill a ChiakiFeedbackState in place.
+ *
+ * Used by spectator mode to neutralize outbound feedback while keeping
+ * the send cadence alive (the PS5 must keep seeing controller frames
+ * or it reports the controller as disconnected).
+ */
+CHIAKI_EXPORT void chiaki_feedback_state_neutralize(ChiakiFeedbackState *state);
+
 #define CHIAKI_HISTORY_EVENT_SIZE_MAX 0x5
 
 typedef struct chiaki_feedback_history_event_t

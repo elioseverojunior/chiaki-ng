@@ -4,6 +4,7 @@
 #include <string.h>
 #include <chiaki/session.h>
 #include <chiaki/log.h>
+#include <chiaki/feedback.h>
 
 // Verify ChiakiConnectInfo has a spectator_mode field that defaults to false.
 static MunitResult test_connect_info_has_spectator_mode_default_false(
@@ -53,6 +54,34 @@ static MunitResult test_session_init_copies_spectator_mode(
 	return MUNIT_OK;
 }
 
+static MunitResult test_feedback_state_neutralize_zeroes_everything(
+		const MunitParameter params[], void *user)
+{
+	(void)params; (void)user;
+	ChiakiFeedbackState state = {
+		.gyro_x = 1.0f, .gyro_y = 2.0f, .gyro_z = 3.0f,
+		.accel_x = 4.0f, .accel_y = 5.0f, .accel_z = 6.0f,
+		.orient_x = 7.0f, .orient_y = 8.0f, .orient_z = 9.0f, .orient_w = 10.0f,
+		.left_x = 100, .left_y = 200, .right_x = 300, .right_y = 400,
+	};
+	chiaki_feedback_state_neutralize(&state);
+	munit_assert_float(state.gyro_x, ==, 0.0f);
+	munit_assert_float(state.gyro_y, ==, 0.0f);
+	munit_assert_float(state.gyro_z, ==, 0.0f);
+	munit_assert_float(state.accel_x, ==, 0.0f);
+	munit_assert_float(state.accel_y, ==, 0.0f);
+	munit_assert_float(state.accel_z, ==, 0.0f);
+	munit_assert_float(state.orient_x, ==, 0.0f);
+	munit_assert_float(state.orient_y, ==, 0.0f);
+	munit_assert_float(state.orient_z, ==, 0.0f);
+	munit_assert_float(state.orient_w, ==, 0.0f);
+	munit_assert_int(state.left_x, ==, 0);
+	munit_assert_int(state.left_y, ==, 0);
+	munit_assert_int(state.right_x, ==, 0);
+	munit_assert_int(state.right_y, ==, 0);
+	return MUNIT_OK;
+}
+
 MunitTest tests_spectator[] = {
 	{
 		"/connect_info_has_spectator_mode_default_false",
@@ -67,6 +96,11 @@ MunitTest tests_spectator[] = {
 	{
 		"/session_init_copies_spectator_mode",
 		test_session_init_copies_spectator_mode,
+		NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL
+	},
+	{
+		"/feedback_state_neutralize_zeroes_everything",
+		test_feedback_state_neutralize_zeroes_everything,
 		NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL
 	},
 	{ NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }

@@ -84,6 +84,13 @@ CHIAKI_EXPORT void chiaki_feedback_state_format_v12(uint8_t *buf, ChiakiFeedback
 	buf[0x1b] = 0x1;
 }
 
+CHIAKI_EXPORT void chiaki_feedback_state_neutralize(ChiakiFeedbackState *state)
+{
+	if(!state)
+		return;
+	memset(state, 0, sizeof(*state));
+}
+
 CHIAKI_EXPORT ChiakiErrorCode chiaki_feedback_history_event_set_button(ChiakiFeedbackHistoryEvent *event, uint64_t button, uint8_t state)
 {
 	// some buttons use a third byte for the state, some don't
