@@ -280,6 +280,7 @@ endif()
 
 if(CHIAKI_ENABLE_TESTS)
 	enable_testing()
+	target_compile_definitions(chiaki-lib PRIVATE CHIAKI_TESTING=1)
 	add_subdirectory(test)
 endif()
 

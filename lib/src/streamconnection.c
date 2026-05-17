@@ -289,7 +289,7 @@ CHIAKI_EXPORT ChiakiErrorCode chiaki_stream_connection_run(ChiakiStreamConnectio
 
 	err = chiaki_mutex_lock(&stream_connection->feedback_sender_mutex);
 	assert(err == CHIAKI_ERR_SUCCESS);
-	err = chiaki_feedback_sender_init(&stream_connection->feedback_sender, &stream_connection->takion);
+	err = chiaki_feedback_sender_init(&stream_connection->feedback_sender, session, &stream_connection->takion);
 	if(err != CHIAKI_ERR_SUCCESS)
 	{
 		chiaki_mutex_unlock(&stream_connection->feedback_sender_mutex);

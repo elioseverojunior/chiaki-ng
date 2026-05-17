@@ -5,6 +5,8 @@
 #include <chiaki/session.h>
 #include <chiaki/log.h>
 #include <chiaki/feedback.h>
+#include <chiaki/feedbacksender.h>
+#include <chiaki/controller.h>
 
 // Verify ChiakiConnectInfo has a spectator_mode field that defaults to false.
 static MunitResult test_connect_info_has_spectator_mode_default_false(
@@ -82,6 +84,54 @@ static MunitResult test_feedback_state_neutralize_zeroes_everything(
 	return MUNIT_OK;
 }
 
+static MunitResult test_sender_neutralizes_when_spectator_mode_on(
+		const MunitParameter params[], void *user)
+{
+	(void)params; (void)user;
+	ChiakiFeedbackSender sender;
+	memset(&sender, 0, sizeof(sender));
+	sender.spectator_mode = true;
+
+	ChiakiControllerState in;
+	chiaki_controller_state_set_idle(&in);
+	in.left_x = 12345;
+	in.left_y = -12345;
+	in.gyro_x = 1.5f;
+	in.accel_z = 9.8f;
+
+	ChiakiFeedbackState out;
+	memset(&out, 0xFF, sizeof(out));  // sentinel
+	chiaki_feedback_sender_prepare_state_for_test(&sender, &in, &out);
+
+	munit_assert_int(out.left_x, ==, 0);
+	munit_assert_int(out.left_y, ==, 0);
+	munit_assert_float(out.gyro_x, ==, 0.0f);
+	munit_assert_float(out.accel_z, ==, 0.0f);
+	return MUNIT_OK;
+}
+
+static MunitResult test_sender_passes_through_when_spectator_mode_off(
+		const MunitParameter params[], void *user)
+{
+	(void)params; (void)user;
+	ChiakiFeedbackSender sender;
+	memset(&sender, 0, sizeof(sender));
+	sender.spectator_mode = false;
+
+	ChiakiControllerState in;
+	chiaki_controller_state_set_idle(&in);
+	in.left_x = 12345;
+	in.gyro_x = 1.5f;
+
+	ChiakiFeedbackState out;
+	memset(&out, 0, sizeof(out));
+	chiaki_feedback_sender_prepare_state_for_test(&sender, &in, &out);
+
+	munit_assert_int(out.left_x, ==, 12345);
+	munit_assert_float(out.gyro_x, ==, 1.5f);
+	return MUNIT_OK;
+}
+
 MunitTest tests_spectator[] = {
 	{
 		"/connect_info_has_spectator_mode_default_false",
@@ -101,6 +151,16 @@ MunitTest tests_spectator[] = {
 	{
 		"/feedback_state_neutralize_zeroes_everything",
 		test_feedback_state_neutralize_zeroes_everything,
+		NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL
+	},
+	{
+		"/sender_neutralizes_when_spectator_mode_on",
+		test_sender_neutralizes_when_spectator_mode_on,
+		NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL
+	},
+	{
+		"/sender_passes_through_when_spectator_mode_off",
+		test_sender_passes_through_when_spectator_mode_off,
 		NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL
 	},
 	{ NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }

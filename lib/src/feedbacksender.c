@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: LicenseRef-AGPL-3.0-only-OpenSSL
 
 #include <chiaki/feedbacksender.h>
+#include <chiaki/session.h>
 #include <chiaki/time.h>
 
 #include <string.h>
@@ -12,15 +13,17 @@
 #define FEEDBACK_HISTORY_RESEND_EVENT_COUNT 0x4
 
 static void *feedback_sender_thread_func(void *user);
+static void feedback_sender_prepare_state(const ChiakiFeedbackSender *sender, const ChiakiControllerState *in, ChiakiFeedbackState *out);
 static void feedback_sender_send_state(ChiakiFeedbackSender *feedback_sender, const ChiakiControllerState *state);
 static void feedback_sender_send_history_packet(ChiakiFeedbackSender *feedback_sender, const uint8_t *buf, size_t buf_size);
 static void feedback_sender_flush_history_locked(ChiakiFeedbackSender *feedback_sender);
 static void feedback_sender_record_history(ChiakiFeedbackSender *feedback_sender, const ChiakiControllerState *state_prev, const ChiakiControllerState *state_now);
 
-CHIAKI_EXPORT ChiakiErrorCode chiaki_feedback_sender_init(ChiakiFeedbackSender *feedback_sender, ChiakiTakion *takion)
+CHIAKI_EXPORT ChiakiErrorCode chiaki_feedback_sender_init(ChiakiFeedbackSender *feedback_sender, ChiakiSession *session, ChiakiTakion *takion)
 {
 	feedback_sender->log = takion->log;
 	feedback_sender->takion = takion;
+	feedback_sender->spectator_mode = session ? session->spectator_mode : false;
 
 	chiaki_controller_state_set_idle(&feedback_sender->controller_state_prev);
 	chiaki_controller_state_set_idle(&feedback_sender->controller_state_history_prev);
@@ -120,29 +123,45 @@ static bool controller_state_equals_for_feedback_state(ChiakiControllerState *a,
 	return true;
 }
 
+static void feedback_sender_prepare_state(const ChiakiFeedbackSender *sender, const ChiakiControllerState *in, ChiakiFeedbackState *out)
+{
+	out->left_x = in->left_x;
+	out->left_y = in->left_y;
+	out->right_x = in->right_x;
+	out->right_y = in->right_y;
+	out->gyro_x = in->gyro_x;
+	out->gyro_y = in->gyro_y;
+	out->gyro_z = in->gyro_z;
+	out->accel_x = in->accel_x;
+	out->accel_y = in->accel_y;
+	out->accel_z = in->accel_z;
+	out->orient_x = in->orient_x;
+	out->orient_y = in->orient_y;
+	out->orient_z = in->orient_z;
+	out->orient_w = in->orient_w;
+	if(sender->spectator_mode)
+		chiaki_feedback_state_neutralize(out);
+}
+
 static void feedback_sender_send_state(ChiakiFeedbackSender *feedback_sender, const ChiakiControllerState *state)
 {
 	ChiakiFeedbackState feedback_state;
-	feedback_state.left_x = state->left_x;
-	feedback_state.left_y = state->left_y;
-	feedback_state.right_x = state->right_x;
-	feedback_state.right_y = state->right_y;
-	feedback_state.gyro_x = state->gyro_x;
-	feedback_state.gyro_y = state->gyro_y;
-	feedback_state.gyro_z = state->gyro_z;
-	feedback_state.accel_x = state->accel_x;
-	feedback_state.accel_y = state->accel_y;
-	feedback_state.accel_z = state->accel_z;
-
-	feedback_state.orient_x = state->orient_x;
-	feedback_state.orient_y = state->orient_y;
-	feedback_state.orient_z = state->orient_z;
-	feedback_state.orient_w = state->orient_w;
+	feedback_sender_prepare_state(feedback_sender, state, &feedback_state);
 
 	ChiakiErrorCode err = chiaki_takion_send_feedback_state(feedback_sender->takion, feedback_sender->state_seq_num++, &feedback_state);
 	if(err != CHIAKI_ERR_SUCCESS)
 		CHIAKI_LOGE(feedback_sender->log, "FeedbackSender failed to send Feedback State");
 }
+
+#ifdef CHIAKI_TESTING
+CHIAKI_EXPORT void chiaki_feedback_sender_prepare_state_for_test(
+		const ChiakiFeedbackSender *sender,
+		const ChiakiControllerState *in,
+		ChiakiFeedbackState *out)
+{
+	feedback_sender_prepare_state(sender, in, out);
+}
+#endif
 
 static void feedback_sender_send_history_packet(ChiakiFeedbackSender *feedback_sender, const uint8_t *buf, size_t buf_size)
 {

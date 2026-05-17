@@ -26,6 +26,7 @@ add_executable(chiaki-unit ${CHIAKI_UNIT_SOURCES})
 add_test(NAME unit COMMAND chiaki-unit)
 
 target_link_libraries(chiaki-unit chiaki-lib munit)
+target_compile_definitions(chiaki-unit PRIVATE CHIAKI_TESTING=1)
 
 if(CHIAKI_ENABLE_FFMPEG_DECODER)
 	target_link_libraries(chiaki-unit FFMPEG::avcodec FFMPEG::avutil)

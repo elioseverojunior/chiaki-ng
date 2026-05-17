@@ -4,9 +4,13 @@
 #define CHIAKI_FEEDBACKSENDER_H
 
 #include "controller.h"
+#include "feedback.h"
 #include "takion.h"
 #include "thread.h"
 #include "common.h"
+
+struct chiaki_session_t;
+typedef struct chiaki_session_t ChiakiSession;
 
 #define CHIAKI_FEEDBACK_HISTORY_PACKET_BUF_SIZE 0x300
 #define CHIAKI_FEEDBACK_HISTORY_PACKET_QUEUE_SIZE 0x40
@@ -31,6 +35,7 @@ typedef struct chiaki_feedback_sender_t
 	size_t history_packet_len;
 
 	bool should_stop;
+	bool spectator_mode;
 	ChiakiControllerState controller_state_prev;
 	ChiakiControllerState controller_state_history_prev;
 	ChiakiControllerState controller_state;
@@ -40,9 +45,16 @@ typedef struct chiaki_feedback_sender_t
 	ChiakiCond state_cond;
 } ChiakiFeedbackSender;
 
-CHIAKI_EXPORT ChiakiErrorCode chiaki_feedback_sender_init(ChiakiFeedbackSender *feedback_sender, ChiakiTakion *takion);
+CHIAKI_EXPORT ChiakiErrorCode chiaki_feedback_sender_init(ChiakiFeedbackSender *feedback_sender, ChiakiSession *session, ChiakiTakion *takion);
 CHIAKI_EXPORT void chiaki_feedback_sender_fini(ChiakiFeedbackSender *feedback_sender);
 CHIAKI_EXPORT ChiakiErrorCode chiaki_feedback_sender_set_controller_state(ChiakiFeedbackSender *feedback_sender, ChiakiControllerState *state);
+
+#ifdef CHIAKI_TESTING
+CHIAKI_EXPORT void chiaki_feedback_sender_prepare_state_for_test(
+		const ChiakiFeedbackSender *sender,
+		const ChiakiControllerState *in,
+		ChiakiFeedbackState *out);
+#endif
 
 #ifdef __cplusplus
 }
