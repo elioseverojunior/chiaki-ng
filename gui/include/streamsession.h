@@ -103,6 +103,7 @@ class SdeckHapticsWorker;
 		bool buttons_by_pos;
 		bool enable_idr_on_fec_failure;
 		bool start_mic_unmuted;
+		bool spectator_mode = false;
 		bool port_guessing_enabled;
 		int port_guess_count;
 		int port_guess_socket_count;

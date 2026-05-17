@@ -174,6 +174,21 @@ int real_main(int argc, char *argv[])
 	QCommandLineOption passcode_option("passcode", "Automatically send your PlayStation login passcode (only affects users with a login passcode set on their PlayStation console).", "passcode");
 	parser.addOption(passcode_option);
 
+	QCommandLineOption spectator_option(
+		"spectator",
+		"Enable Spectator Mode (read-only - no controller input sent to PS5).");
+	parser.addOption(spectator_option);
+
+	QCommandLineOption no_spectator_option(
+		"no-spectator",
+		"Disable Spectator Mode for this launch (overrides saved setting).");
+	parser.addOption(no_spectator_option);
+
+	QCommandLineOption lock_spectator_option(
+		"lock-spectator",
+		"Hide the Spectator Mode toggle from the settings UI for this session.");
+	parser.addOption(lock_spectator_option);
+
 	parser.process(app);
 	QStringList args = parser.positionalArguments();
 
@@ -187,6 +202,20 @@ int real_main(int argc, char *argv[])
 	bool use_alt_settings = false;
 	if(!parser.isSet(profile_option))
 		use_alt_settings = true;
+
+	if(parser.isSet(spectator_option) && parser.isSet(no_spectator_option))
+	{
+		fprintf(stderr, "Cannot combine --spectator and --no-spectator.\n");
+		return 1;
+	}
+	Settings *active_settings = use_alt_settings ? &alt_settings : &settings;
+	if(parser.isSet(spectator_option))
+		active_settings->SetSpectatorMode(true);
+	else if(parser.isSet(no_spectator_option))
+		active_settings->SetSpectatorMode(false);
+
+	bool spectator_locked = parser.isSet(lock_spectator_option);
+	(void)spectator_locked;  // consumed in Phase 7.4 (settings dialog hide)
 
 	if(args.length() == 0)
 		return RunMain(app, use_alt_settings ? &alt_settings : &settings, exit_app_on_stream_exit);
